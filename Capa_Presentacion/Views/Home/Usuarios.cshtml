@@ -1,0 +1,549 @@
+﻿
+@{
+    ViewData["Title"] = "Usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
+    <li class="breadcrumb-item active">Usuarios</li>
+</ol>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Lista de Usuarios
+    </div>
+    <div class="card-body position-relative">
+        <div class="row">
+            <div class="col-12">
+                @* <button type="button" class="btn btn-success px-3" onclick="abrirModal()">Crear Nuevo <i class="fas fa-user ms-2"></i></button> *@
+                @{
+                    ViewData["IdModal"] = "FormModal";
+                    ViewData["Titulo"] = "Nuevo Usuario";
+                }
+                @await Html.PartialAsync("./Components/_ModalView")
+
+                <button type="button" id="btnGuardar" class="btn btn-success px-3" data-bs-toggle="modal" data-bs-target="#FormModal">Crear Nuevo <i class="fas fa-user ms-2"></i></button>
+            </div>
+        </div>
+
+        <hr />
+
+        <div id="tablaContainer">
+            <table id="idTabla" class="table table-hover table-bordered align-middle text-secondary" style="width: 100%">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Correo</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody" class="text-secondary"></tbody>
+            </table>
+
+            <!-- 🟢 Spinner para la tabla -->
+            <div id="spinnerTabla"
+                 class=" position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75"
+                 style="z-index:1050; border-radius:0.375rem;">
+                @await Html.PartialAsync("./Components/_Spinner")
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@* @await Component.InvokeAsync("_ModalView") *@
+
+<style>
+    .swal2-confirm{
+        margin-left: 5px;
+    }
+
+    .swal2-cancel{
+        margin-right: 5px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let modoEdicion = false;
+        let idUsuarioEditando = 0;
+
+        $(document).ready(function () {
+            
+            const $spinner = $('#spinnerTabla');
+
+            // 🔹 Mostrar spinner antes de comenzar
+            $spinner.removeClass('d-none');
+
+            $.get({
+                url: '@Url.Action("ListarUsuarios", "Home")',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8'
+            })
+            .done(function (data) {
+                var $tbody = $('#tableBody').empty();
+
+                $.each(data.data, function (_, u) {
+                    $tbody.append(
+                        $('<tr>').append(
+                            $('<td>').addClass('pt-2').text(u.nombres),
+                            $('<td>').addClass('pt-2').text(u.apellidos),
+                            $('<td>').addClass('pt-2').text(u.correo),
+                            $('<td>').addClass('pt-2').append(
+                                u.activo
+                                    ? $('<span>').addClass('badge bg-success').text('Sí')
+                                    : $('<span>').addClass('badge bg-danger').text('No')
+                            ),
+                            // o sino
+                            /*$('<td>').addClass('pt-2').html(
+                                u.activo
+                                    ? '<span class="badge bg-success">Sí</span>'
+                                    : '<span class="badge bg-danger">No</span>'
+                            )*/
+                            $('<td>').addClass('pt-2').append(
+                                $('<button>') //Boton de Editar
+                                    .addClass('btn btn-primary btn-sm btn-editar')
+                                    .attr({
+                                        'data-id': u.idUsuario,
+                                        'data-nombres': u.nombres,
+                                        'data-apellidos': u.apellidos,
+                                        'data-correo': u.correo,
+                                        'data-activo': u.activo
+                                    })
+                                    .html('<i class="fas fa-pen"></i>'),
+                                $('<button>')
+                                    .addClass('btn btn-danger btn-sm ms-1 btn-eliminar') // Boton de Eliminar
+                                    .attr('data-id', u.idUsuario)
+                                    .append($('<i>').addClass('fas fa-trash')) // icono de Eliminar
+                            )
+                        )
+                    );
+                });
+
+                /*new DataTable('#idTabla', {
+                    responsive: true,
+                    ordering: false,
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                    },
+                    columnDefs: [
+                        // Índice 4 = columna "Acciones" (la 5ª columna)
+                        {
+                            targets: 4, // ¡Importante! Aplica a la columna 5 (índice 0 = primera columna) → "Acciones"
+                            orderable: false, // No se puede ordenar con clic
+                            searchable: false, // No se incluye en la búsqueda
+                            width: "100px", //Fija el ancho a 90px
+                            //className: 'text-center' // Centra el contenido
+                        }
+                    ]
+                });*/
+
+                let dataTable = {
+                    responsive: true,
+                    ordering: false,
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                    },
+                    columnDefs: [
+                        // Índice 4 = columna "Acciones" (la 5ª columna)
+                        {
+                            targets: 4, // ¡Importante! Aplica a la columna 5 (índice 0 = primera columna) → "Acciones"
+                            orderable: false, // No se puede ordenar con clic
+                            searchable: false, // No se incluye en la búsqueda
+                            width: "100px", //Fija el ancho a 90px
+                            //className: 'text-center' // Centra el contenido
+                        }
+                    ]
+                }
+
+                new DataTable('#idTabla', dataTable);
+            })
+            .fail(function (xhr) {
+                console.error('Error al cargar usuarios:', xhr);
+            })
+            .always(function () {
+                // 🔹 Ocultar el spinner siempre (éxito o error)
+                $spinner.addClass('d-none');
+            });
+
+        });
+
+        // function abrirModal() {
+        //     $('#FormModal').modal('show');
+        // }
+
+        //--------------------------------------------------------------------------------------------
+        //Para invocar el modal en modo edición
+        $("#idTabla #tableBody").on("click", '.btn-editar', function() {
+            // let fileSelected = $(this).closest("tr");
+
+            // let data = dataTable.row(fileSelected).data();
+
+            modoEdicion = true;
+            idUsuarioEditando = $(this).data('id');
+
+            // Rellena los campos del modal
+            $('#txtNombre').val($(this).data('nombres'));
+            $('#txtApellido').val($(this).data('apellidos'));
+            $('#txtCorreo').val($(this).data('correo'));
+            $('#cboActivo').val($(this).data('activo') ? "1" : "0");
+
+            // Cambia el título del modal
+            $('#modalTitle').text('Editar Usuario');
+
+            $('#ErrorMessege').hide();
+
+            // Muestra el modal
+            $('#FormModal').modal('show');
+
+            // console.log(data);
+        });
+        //--------------------------------------------------------------------------------------------
+
+        //--------------------------------------------------------------------------------------------
+
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false,
+            reverseButtons: true,
+            focusConfirm: false
+        });
+
+        // Metodo para eliminar datos
+        $("#idTabla #tableBody").on("click", '.btn-eliminar', function() {
+            // let userSelected = $(this).closest("tr");
+
+            // let data = dataTable.row(userSelected).data();
+
+            // console.log(data);
+
+            let id = $(this).data('id');
+            // console.log("Eliminar usuario con ID:", id)
+
+            // Mostrar spinner
+            // $('#spinnerLoad').removeClass('d-none');
+
+            swalWithBootstrapButtons.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esta acción!",
+                icon: "warning",
+                showCancelButton: true,
+                // confirmButtonText: "Sí, eliminar",
+                // cancelButtonText: "No, cancelar",
+                confirmButtonText: '<i class="fa fa-check"></i> Sí, eliminar',
+                cancelButtonText: '<i class="fa fa-times"></i> No, cancelar',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mostrar spinner mientras se procesa
+                    Swal.fire({
+                        title: 'Eliminando...',
+                        text: 'Por favor espera',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.post('@Url.Action("EliminarUsuario", "Home")', {id: id})
+                        .done(function (resp) {
+                            if (resp.resultado != 0) {
+
+                                // alert("✅ Usuario eliminado correctamente");
+                                // location.reload();
+                                swalWithBootstrapButtons.fire({
+                                    title: "¡Eliminado!",
+                                    text: "El usuario ha sido eliminado correctamente.",
+                                    icon: "success",
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload(); // Recarga la página o actualiza la tabla
+                                });
+                            } else {
+                                // alert("⚠️ No se pudo eliminar el usuario: " + resp.mensaje);
+                                swalWithBootstrapButtons.fire({
+                                    title: "Error",
+                                    text: "No se pudo eliminar el usuario: " + (resp.mensaje || "Error desconocido"),
+                                    icon: "error"
+                                });
+                            }
+                        })
+                        .fail(function (xhr) {
+                            // console.error('Error al eliminar usuario:', xhr);
+                            // alert("❌ Error al eliminar usuario");
+                            console.error('Error AJAX:', xhr);
+                            swalWithBootstrapButtons.fire({
+                                title: "Error del servidor",
+                                text: "No se pudo conectar con el servidor. Inténtalo más tarde.",
+                                icon: "error"
+                            });
+                        })
+                        // .always(function() {
+                        //     Ocultar spinner siempre (éxito o error)
+                        //     $('#spinnerLoad').addClass('d-none');
+                        // });
+                } 
+                else if (result.dismiss === Swal.DismissReason.cancel) 
+                {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelado",
+                        text: "El usuario está a salvo 😊",
+                        icon: "error",
+                        timer: 1800,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+        //--------------------------------------------------------------------------------------------
+
+        //--------------------------------------------------------------------------------------------
+        // Limpiar los campos
+        $('#btnGuardar').on('click', function () {
+            modoEdicion = false;
+            idUsuarioEditando = null;
+
+            // Limpia los campos para nuevo registro
+            $('#txtNombre, #txtApellido, #txtCorreo').val('');
+            $('#cboActivo').val('1');
+
+            $('#modalTitle').text('Nuevo Usuario');
+            $('#ErrorMessege').hide();
+            $('#FormModal').modal('show');
+        });
+        //--------------------------------------------------------------------------------------------
+        // 👉 Cuando hago clic en Guardar cambios
+        @*
+        $('#btnModalSave').on('click', function () {
+            const usuario = {
+                idUsuario: idUsuarioEditando || 0,
+                nombres: $('#txtNombre').val(),
+                apellidos: $('#txtApellido').val(),
+                correo: $('#txtCorreo').val(),
+                activo: $('#cboActivo').val() === "1"
+            };
+
+            $.ajax({
+                url: '@Url.Action("GuardarUsuario", "Home")',
+                type: 'POST',
+                data: JSON.stringify(usuario),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json'
+            })
+            .done(function (resp) {
+                if (resp.resultado) {
+                    alert("✅ " + resp.mensaje);
+                    $('#FormModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert("⚠️ " + resp.mensaje);
+                }
+            })
+            .fail(function (xhr) {
+                console.error('Error al guardar usuario:', xhr);
+                alert("❌ Error al guardar usuario");
+            });
+        });
+
+        *@
+
+        //--------------------------------------------------------------------------------------------
+        // llamada del id del boton de guardar en el modal "_ModalView"
+        $('#btnModalSave').on('click', function() {
+            const Usuario = {
+                idUsuario: idUsuarioEditando || 0,
+                nombres: $('#txtNombre').val(),
+                apellidos: $('#txtApellido').val(),
+                correo: $('#txtCorreo').val(),
+                activo: $('#cboActivo').val() === "1"
+            };
+
+            // Mostrar spinner
+            $('#spinnerLoad').removeClass('d-none');
+            // $('#formContainer').addClass('opacity-50 pe-none');
+
+            $.post('@Url.Action("GuardarUsuario", "Home")', Usuario)
+                .done(function (resp) {
+                    if (resp.resultado != 0) {
+                        // alert("✅ " + resp.mensaje);
+                        // Usuario.idUsuario = resp.resultado
+                        $('#FormModal').modal('hide');
+                        location.reload();
+                    } else {
+                        // alert("⚠️ " + resp.mensaje);
+                        $('#ErrorMessege').text(resp.mensaje);
+                        $('#ErrorMessege').show();
+                    }
+                })
+                .fail(function (xhr) {
+                    console.error('Error al guardar usuario:', xhr);
+                    alert("❌ Error al guardar usuario");
+                })
+                .always(function() {
+                    // Ocultar spinner siempre (éxito o error)
+                    $('#spinnerLoad').addClass('d-none');
+                    // $('#formContainer').removeClass('opacity-50');
+                });
+        });
+    </script>
+}
+
+@* @section Scripts {
+    <script>
+        $(function () {
+            $.getJSON('@Url.Action("ListarUsuarios", "Home")')
+                .done(function (data) {
+                    var $tbody = $('#tabla #tableBody').empty();
+                    $.each(data, function(_, u) {
+                        $tbody.append(
+                            $('<tr>').append(
+                                $('<td>').text(u.nombres),
+                                $('<td>').text(u.apellidos),
+                                $('<td>').text(u.correo),
+                                $('<td>').text(u.activo ? 'Si' : 'No')
+                            )
+                        );
+                    });
+                })
+                .fail(function (xhr) {
+                    console.error('Error al cargar usuarios:', xhr);
+                });
+        });
+    </script>
+} *@
+
+@* @section Scripts {
+    <script>
+        /*$(function () {
+            $.get({
+                url: '@Url.Action("ListarUsuarios", "Home")',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8'
+            })
+            .done(function (data) {
+                var $tbody = $('#idTabla #tableBody').empty();
+                $.each(data, function(_, u) {
+                    $tbody.append(
+                        $('<tr>').append(
+                            $('<td>').addClass('pt-2').text(u.nombres),
+                            $('<td>').addClass('pt-2').text(u.apellidos),
+                            $('<td>').addClass('pt-2').text(u.correo),
+                            $('<td>').addClass('pt-2').text(u.activo ? 'Si' : 'No')
+
+                            // $('<td>', {
+                            //     'class': 'text-start fw-bold',
+                            //     'text': u.nombres
+                            // }),
+                            // $('<td>', {
+                            //     'class': 'text-start',
+                            //     'text': u.apellidos
+                            // }),
+                            // $('<td>', {
+                            //     'class': 'text-truncate',
+                            //     'text': u.correo
+                            // }),
+                            // $('<td>', {
+                            //     'class': 'text-center',
+                            //     'text': u.activo ? 'Si' : 'No'
+                            // })
+
+                            // $('<td>').addClass('text-start fw-bold').text(u.nombres),
+                            // $('<td>').addClass('text-start').text(u.apellidos),
+                            // $('<td>').addClass('text-truncate').text(u.correo),
+                            // $('<td>').addClass('text-center').text(u.activo ? 'Si' : 'No')
+                        )
+
+                        // $tbody.append(`
+                        //     <tr>
+                        //         <td class="text-start fw-bold">${u.nombres}</td>
+                        //         <td class="text-start">${u.apellidos}</td>
+                        //         <td class="text-truncate">${u.correo}</td>
+                        //         <td class="text-center">${u.activo ? 'Si' : 'No'}</td>
+                        //     </tr>
+                        // `);
+                    );
+                });
+            })
+            .fail(function (xhr) {
+                console.error('Error al cargar usuarios:', xhr);
+            });
+        });*/
+
+        var tabladata = $('#idTabla').DataTable({
+            responsive: true,
+            ordering: false,
+            "ajax" : {
+                url: '@Url.Action("ListarUsuarios", "Home")',
+                type: 'GET',
+                dataType: 'json'
+            },
+            "columns" : [
+                {"data": "nombres"},
+                {"data": "apellidos"},
+                {"data": "correo"},
+                {
+                    "data": "activo", "render": function(valor) {
+                        if(valor) {
+                            return 'Si'
+                        } else {
+                            return 'No'
+                        }
+                    }
+                },
+                {
+                    "defaultContent": '<button type="button" class="btn btn-primary btn-sm"><i class="fas fa-pen"></i></button>' +
+                                        '<button type="button" class="btn btn-danger btn-sm ms-1"><i class="fas fa-trash"></i></button>',
+                    "orderable": false,
+                    "searchable": false,
+                    "width": "90px"
+                }
+            ],
+            "language": {
+                "url": 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+            }
+        });
+
+        function Guarder() {
+            var Usuario = {
+                idUsuario: 0,
+                nombres: $('#txtNombre').val(),
+                apellidos: $('#txtApellido').val(),
+                correo: $('#txtCorreo').val(),
+                activo: $('#cboActivo').val() == 1 ? true : false
+            };
+
+            jQuery.post({
+                url: '@Url.Action("GuardarUsuario", "Home")',
+                type: 'POST',
+                data: JSON.stringify(Usuario),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (data) {
+                    if(Usuario.idUsuario == 0){
+                        if(data.resultado != 0){
+                            alert("✅ " + data.mensaje);
+                            $('#FormModal').modal('hide');
+                            tabladata.ajax.reload();
+                        } else {
+                            alert("⚠️ " + data.mensaje);
+                        })
+
+                    }
+                    else {
+                        
+                    }
+                }
+            });
+        }
+    </script>
+} *@

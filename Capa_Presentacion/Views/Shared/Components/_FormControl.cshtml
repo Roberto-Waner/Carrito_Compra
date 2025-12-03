@@ -1,0 +1,48 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+@* @{
+    var labelTitle = ViewData["label-title"] as string;
+    var inputType = ViewData["type"] as string;
+    var idInput = ViewData["id-input"] as string;
+    var placeholderInput = ViewData["placeholder-input"] as string;
+}
+
+<div class="col-sm-6">
+    <label for="exampleFormControlInput1" class="form-label">@labelTitle</label>
+    <input type="@inputType" class="form-control" id="@idInput" placeholder="@placeholderInput">
+</div>
+
+@{
+
+}
+<div class="col-sm-6">
+    <label for="exampleFormControlInput1" class="form-label">@labelTitle</label>
+    <select class="form-select" aria-label="Default select example">
+        <option value="1">Si</option>
+        <option value="0">No</option>
+    </select>
+</div> *@
+
+@model FormFieldViewModel
+
+<div class="col-sm-6">
+    <label for="@Model.Form_Id" class="form-label">@Model.Container_Label</label>
+
+    @if (Model.Input_Type == "select" && Model.Select_Options != null)
+    {
+        <select class="form-select" aria-label="Default select example" id="@Model.Form_Id">
+            @foreach (var option in Model.Select_Options)
+            {
+                <option value="@option.Key">@option.Value</option>
+            }
+        </select>
+    }
+    else
+    {
+        <input type="@Model.Input_Type" class="form-control" id="@Model.Form_Id" placeholder="@Model.Input_Placeholder">
+        @* <input type="@Model.Input_Type" class="form-control" id="@Model.Form_Id" placeholder="@Model.Input_Placeholder" autocomplete="off"> *@
+    }
+</div>

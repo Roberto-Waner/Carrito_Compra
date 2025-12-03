@@ -1,0 +1,138 @@
+﻿
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var idModal = ViewData["IdModal"] as string;
+    var modalTitle = ViewData["Titulo"] as string ?? "Titulos-Indefinido";
+
+    // 🔹 Aquí defines los campos del formulario dinámico
+
+    var campoForm = new List<FormFieldViewModel>
+    {
+        new FormFieldViewModel
+        {
+            Container_Label = "Nombre",
+            Input_Type = "text",
+            Input_Placeholder = "Ingrese su nombre",
+            Form_Id = "txtNombre"
+        },
+        new FormFieldViewModel
+        {
+            Container_Label = "Apellido",
+            Input_Type = "text",
+            Input_Placeholder = "Ingrese su apellido",
+            Form_Id = "txtApellido"
+        },
+        new FormFieldViewModel
+        {
+            Container_Label = "Correo Electrónico",
+            Input_Type = "email",
+            Input_Placeholder = "Ingrese su correo",
+            Form_Id = "txtCorreo"
+        },
+        new FormFieldViewModel
+        {
+            Container_Label = "Activo",
+            Input_Type = "select",
+            Form_Id = "cboActivo",
+            Select_Options = new Dictionary<string, string>
+            {
+                { "1", "Sí" },
+                { "0", "No" }
+            }
+        }
+    };
+}
+
+<!-- Modal -->
+<div class="modal fade" id="@idModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white border-0">
+                <h1 class="modal-title fs-5" id="modalTitle">@modalTitle</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body position-relative d-flex align-items-center justify-content-center">
+                <div id="spinnerLoad"
+                     class="position-absolute w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center d-none"
+                     style="z-index: 1055;">
+                    <!-- Spinner (componente) -->
+                    @await Html.PartialAsync("./Components/_Spinner")
+                </div>
+                
+                @* <div class="row">
+                    @await Html.PartialAsync("_FormField", new FormFieldViewModel {
+                        Label = "Nombre",
+                        Type = "text",
+                        Id = "nombre",
+                        Placeholder = "Ingrese su nombre"
+                    })
+
+                    @await Html.PartialAsync("_FormField", new FormFieldViewModel {
+                        Label = "Correo electrónico",
+                        Type = "email",
+                        Id = "correo",
+                        Placeholder = "ejemplo@correo.com"
+                    })
+
+                    @await Html.PartialAsync("_FormField", new FormFieldViewModel {
+                        Label = "Activo",
+                        Type = "select",
+                        Id = "activo",
+                        Options = new Dictionary<string, string> {
+                            { "1", "Sí" },
+                            { "0", "No" }
+                        }
+                    })
+                </div> *@
+
+                @* @model List<FormFieldViewModel> *@
+                <div id="formWrapper">
+                    <div id="formContainer" class="row g-3">
+                    
+                        @foreach (var camp in campoForm)
+                        {
+                            @await Html.PartialAsync("./Components/_FormControl", camp)
+                        }
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div id="ErrorMessege" class="alert alert-danger" role="alert">
+                                Los campos no puede ser nulos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" id="btnModalSave" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('@Url.Action("ListarUsuarios", "Home")', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(data => {
+                data.data.forEach(u => {
+
+                })
+            }
+        });
+    </script>
+}
+*@
