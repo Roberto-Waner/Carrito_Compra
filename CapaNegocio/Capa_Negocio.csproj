@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CapaEntidad\Capa_Entidad.csproj" />
     <ProjectReference Include="..\Capa_Dato\Capa_Datos.csproj" />
   </ItemGroup>

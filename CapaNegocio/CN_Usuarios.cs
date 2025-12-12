@@ -22,10 +22,53 @@ namespace Capa_Negocio
 
             if(string.IsNullOrEmpty(mensaje)) 
             {
-                string clave = "test123";
-                obj.clave = CN_Recursos.ConvertirSha256(clave);
+                string clave = CN_Recursos.GenerarClave();
 
-                return objCapaDato.Registrar(obj, out mensaje);
+                string code = $"{clave}";
+
+                string asunto = "Creación de Cuenta";
+
+                string menssaje_correo = $@"
+                    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background-color: #f9f9f9; color: #333;'>
+                        <h2 style='text-align: center; color: #667db6;'>✨ ¡Recupera tu Contraseña! ✨</h2>
+                        <p style='font-size: 16px; line-height: 1.6;'>
+                            Hola, hemos recibido una solicitud para restablecer tu contraseña. Si no has solicitado esto, puedes ignorar este correo. 
+                            De lo contrario, sigue las instrucciones a continuación. 
+                        </p>
+                        <hr>
+                        <p style='text-align: center; font-size: 16px;'>
+                            <strong>No responder a este correo.</strong>
+                        </p>
+                        <hr>
+                        <p style='font-size: 14px; text-align: center; color: #888;'>
+                            Copia y pega el siguiente enlace en tu navegador:
+                        </p>
+                        <div style='background-color: #f1f1f1; padding: 10px; border: 1px dashed #ccc; border-radius: 5px; text-align: center;'>
+                            <span id='resetLink' style='word-break: break-all; font-size: 14px; color: #555;'>{code}</span>
+                        </div>
+                        <p style='font-size: 12px; text-align: center; margin-top: 20px; color: #888;'>
+                            ⚠ Este enlace es válido por 1 hora. Si expira, solicita un nuevo enlace desde la App en la pestaña de recuperación de contraseña.
+                        </p>
+                        <p style='text-align: center;'>
+                            <strong>💡 Consejo:</strong> Mantén presionado el enlace y selecciona <i>Copiar</i> en tu móvil o haz clic derecho en tu computadora.
+                        </p>
+                    </div>
+                ";
+
+                bool resp = CN_Recursos.EnviarCorreo(obj.correo, asunto, menssaje_correo);
+
+                if(resp)
+                {
+                    obj.clave = CN_Recursos.ConvertirSha256(clave);
+
+                    return objCapaDato.Registrar(obj, out mensaje);
+                }
+                else
+                {
+                    mensaje = "No se pudo enviar el correo electrónico.";
+                    return 0;
+                }
+
             }
             else return 0;
         }
