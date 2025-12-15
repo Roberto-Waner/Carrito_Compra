@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 
-namespace Capa_Dato
+namespace Capa_Datos
 {
     public class Conexion
     {

@@ -1,4 +1,4 @@
-﻿using Capa_Dato;
+﻿using Capa_Datos;
 using Capa_Entidad;
 
 namespace Capa_Negocio

@@ -1,0 +1,117 @@
+﻿@{
+    var breadcrumbs = ViewData["Breadcrumbs"] as List<Dictionary<string, string>>;
+}
+
+<ol class="breadcrumb my-4">
+    <li id="breadcrumb0">Estas Aquí: &nbsp;&nbsp; </li>
+
+    @if(breadcrumbs != null)
+    {
+        var lastIndex = breadcrumbs.Count - 1;
+        for(int i = 0; i < breadcrumbs.Count; i++)
+        {
+            var item = breadcrumbs[i];
+            var titulo = item.ContainsKey("Titulo") ? item["Titulo"] : "";
+            var url = item.ContainsKey("Url") ? item["Url"] : "";
+
+            if (i == lastIndex || string.IsNullOrEmpty(url))
+            {
+                <li class="breadcrumb-item active breadcrumb-responses" aria-current="page">@titulo</li>
+            }
+            else
+            {
+                <li class="breadcrumb-item breadcrumb-responses">
+                    <a id="breadcrumb-item1" href="@url">@titulo</a>
+                </li>
+            }
+        }
+    }
+
+    @* <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
+    <li class="breadcrumb-item active">Usuarios</li> *@
+</ol>
+
+@* <div id="breadcontainer" class="col-12 shadow-none vw-100">
+    <div class="breadcrumb mb-0 p-2">
+        <ol class="container d-flex flex-column flex-lg-row">
+            <li id="breadcrumb0">Estas Aquí:&nbsp;&nbsp;</li>
+            @if (breadcrumbs != null)
+            {
+                var lastIndex = breadcrumbs.Count - 1;
+                for (int i = 0; i < breadcrumbs.Count; i++)
+                {
+                    var item = breadcrumbs[i];
+                    var titulo = item.ContainsKey("Titulo") ? item["Titulo"] : "";
+                    var url = item.ContainsKey("Url") ? item["Url"] : "";
+
+                    if (i == lastIndex || string.IsNullOrEmpty(url))
+                    {
+                        <li class="breadcrumb-item active breadcrumb-responses" aria-current="page">@titulo</li>
+                    }
+                    else
+                    {
+                        <li class="breadcrumb-item breadcrumb-responses">
+                            <a id="breadcrumb-item1" href="@url">@titulo</a>
+                        </li>
+                    }
+                }
+            }
+        </ol>
+    </div>
+</div>
+
+<style>
+    #breadcontainer {
+        text-align: left;
+        padding: 0px;
+        width: 100%;
+    }
+
+    .breadcrumb {
+        text-align: left;
+        white-space: nowrap;
+        background-color: var(--color-opret-purewhite) !important;
+    }
+
+    #breadcrumb0 {
+        color: black;
+    }
+
+    #breadcrumb-item1 {
+        color: var(--color-opret-navy) !important;
+    }
+
+    #breadcrumb-item2 {
+        color: var(--color-opret-smoke) !important;
+    }
+
+    .breadcrumb-responses {
+        overflow: hidden; /* Oculta el texto que se sale */
+        text-overflow: ellipsis; /* Muestra los ... */
+        display: inline-block;
+    }
+
+    @@media (max-width: 1400px) {
+        .breadcrumb-responses {
+            max-width: 600px;
+        }
+    }
+
+    @@media (max-width: 1200px) {
+        .breadcrumb-responses {
+            max-width: 550px;
+        }
+    }
+
+    @@media (max-width: 992px) {
+        .breadcrumb-responses {
+            max-width: 500px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .breadcrumb-responses {
+            max-width: 400px;
+        }
+    }
+</style> *@

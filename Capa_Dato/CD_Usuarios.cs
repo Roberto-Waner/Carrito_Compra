@@ -2,7 +2,7 @@
 using Microsoft.Data.SqlClient;
 using System.Data;
 
-namespace Capa_Dato
+namespace Capa_Datos
 {
     public class CD_Usuarios
     {
