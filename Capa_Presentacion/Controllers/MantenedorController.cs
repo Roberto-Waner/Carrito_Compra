@@ -6,17 +6,8 @@ namespace Capa_Presentacion.Controllers
 {
     public class MantenedorController : Controller
     {
+        #region Categoria
         public IActionResult Categoria()
-        {
-            return View();
-        }
-
-        public ActionResult Marca()
-        {
-            return View();
-        }
-
-        public ActionResult Producto()
         {
             return View();
         }
@@ -26,7 +17,7 @@ namespace Capa_Presentacion.Controllers
         {
             List<Categoria> oLista = new List<Categoria>();
             oLista = new CN_Categoria().Listar();
-            return Json(new { data = oLista });
+            return Json(new { listData = oLista });
         }
 
         [HttpPost]
@@ -38,7 +29,7 @@ namespace Capa_Presentacion.Controllers
             if (objeto.idCategoria == 0) resultado = new CN_Categoria().Registrar(objeto, out mensaje);
             else resultado = new CN_Categoria().Editar(objeto, out mensaje);
 
-            return Json(new {resultado = resultado, mensaje = mensaje });
+            return Json(new { resultado = resultado, mensaje = mensaje });
         }
 
         [HttpPost]
@@ -49,5 +40,22 @@ namespace Capa_Presentacion.Controllers
             resultado = new CN_Categoria().Eliminar(id, out mensaje);
             return Json(new { resultado = resultado, mensaje = mensaje });
         }
+
+        #endregion
+
+        #region Marca
+        public ActionResult Marca()
+        {
+            return View();
+        }
+
+        #endregion
+
+        #region Producto
+        public ActionResult Producto()
+        {
+            return View();
+        }
+        #endregion
     }
 }

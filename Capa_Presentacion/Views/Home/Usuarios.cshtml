@@ -11,8 +11,8 @@
 @{
     ViewData["Breadcrumbs"] = new List<Dictionary<string, string>>
     {
-        new() { { "Titulo", "Resumen" }, { "Url", "Index" } },
-        new() { { "Titulo", "Usuarios" }, { "Url", "#" } }
+        new() { { "Titulo", "Resumen" }, { "Url", "#" } },
+        new() { { "Titulo", "Usuarios" }, { "Url", "Usuarios" } }
     };
     @await Html.PartialAsync("./Components/_BreadCrumb")
 }
@@ -35,9 +35,9 @@
             </div>
         </div>
 
-        <hr />
+        @*<hr />*@
 
-        <div id="tablaContainer">
+        <div id="tablaContainer" class="border-top border-dark mt-3 pb-4">
             <table id="idTabla" class="table table-hover table-bordered align-middle text-secondary" style="width: 100%">
                 <thead class="table-dark">
                     <tr>
@@ -54,7 +54,7 @@
 
             <!-- 🟢 Spinner para la tabla -->
             <div id="spinnerTabla"
-                 class=" position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75"
+                 class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75"
                  style="z-index:1050; border-radius:0.375rem;">
                 @await Html.PartialAsync("./Components/_Spinner")
             </div>
@@ -66,13 +66,9 @@
 @* @await Component.InvokeAsync("_ModalView") *@
 
 <style>
-    .swal2-confirm{
-        margin-left: 5px;
-    }
+    .swal2-confirm{ margin-left: 5px; }
 
-    .swal2-cancel{
-        margin-right: 5px;
-    }
+    .swal2-cancel{ margin-right: 5px; }
 </style>
 
 @section Scripts {
