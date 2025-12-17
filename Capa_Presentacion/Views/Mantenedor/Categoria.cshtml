@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
- @{
+@{
     ViewData["Breadcrumbs"] = new List<Dictionary<string, string>>
     {
         new() { { "Titulo", "Mantenimiento" }, { "Url", "#" } },
@@ -12,16 +12,41 @@
     @await Html.PartialAsync("./Components/_BreadCrumb")
 }
 
+@{
+    // Aquí defines los campos del formulario dinámico
+    ViewData["CamposFormulario"] = new List<FormFieldViewModel>
+    {
+        new()
+        {
+            Container_Label = "Descripción",
+            Input_Type = "text",
+            Input_Placeholder = "Ingrese la descripción",
+            Form_Id = "txtDescripcion"
+        },
+        new()
+        {
+            Container_Label = "Activo",
+            Input_Type = "select",
+            Form_Id = "cboActivo",
+            Select_Options = new Dictionary<string, string>
+            {
+                { "1", "Sí" },
+                { "0", "No" }
+            }
+        }
+    };
+}
+
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-users me-1"></i> Lista de Usuarios
+        <i class="fas fa-users me-1"></i> Lista de Categorias
     </div>
     <div class="card-body position-relative">
         <div class="row">
             <div class="col-12">
                 @{
                     ViewData["IdModal"] = "FormModal";
-                    ViewData["Titulo"] = "Crear nueva Categoria";
+                    ViewData["Titulo"] = "Crear Nueva Categoria";
                 }
                 @await Html.PartialAsync("./Components/_ModalView")
 
@@ -29,9 +54,9 @@
             </div>
         </div>
 
-        <hr />
+        @*<hr />*@
 
-        <div id="tablaContainer">
+        <div id="tablaContainer" class="border-top border-dark mt-3 pb-4">
             <table id="idTabla" class="table table-hover table-bordered align-middle text-secondary" style="width: 100%">
                 <thead class="table-dark">
                     <tr>
@@ -63,6 +88,9 @@
 
 @section Scripts {
     <script>
+        let modoEdicion = false;
+        let idUsuarioEditando = 0;
+
         $(document).ready(function () {
             const $spinner = $('#spinnerTabla');
 
@@ -86,20 +114,20 @@
                                     ? $('<span>').addClass('badge bg-success').text('Sí')
                                     : $('<span>').addClass('badge bg-danger').text('No')
                             ),
-                            // $('<td>').addClass('pt-2').append(
-                            //     $('<button>')
-                            //         .addClass('btn btn-primary btn-sm btn-editar')
-                            //         .attr({
-                            //             'data-id': c.idCategoria,
-                            //             'data-description': c.description,
-                            //             'data-activo': c.activo
-                            //         })
-                            //         .html('<i class="fas fa-pen"></i>')
-                            //     $('<button>')
-                            //         .addClass('btn btn-danger btn-sm ms-1 btn-eliminar') // Boton de Eliminar
-                            //         .attr('data-id', c.idCategoria)
-                            //         .append($('<i>').addClass('fas fa-trash')) // icono de Eliminar
-                            // )
+                            $('<td>').addClass('pt-2').append(
+                                $('<button>')
+                                    .addClass('btn btn-primary btn-sm btn-editar')
+                                    .attr({
+                                        'data-id': c.idCategoria,
+                                        'data-description': c.description,
+                                        'data-activo': c.activo
+                                    })
+                                    .html('<i class="fas fa-pen"></i>'),
+                                $('<button>')
+                                    .addClass('btn btn-danger btn-sm ms-1 btn-eliminar') // Boton de Eliminar
+                                    .attr('data-id', c.idCategoria)
+                                    .append($('<i>').addClass('fas fa-trash')) // icono de Eliminar
+                            )
                         )
                     );
                 });

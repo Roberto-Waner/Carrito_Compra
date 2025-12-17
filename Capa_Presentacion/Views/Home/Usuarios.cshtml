@@ -8,6 +8,7 @@
     <li class="breadcrumb-item active">Usuarios</li>
 </ol> *@
 
+@*Migaja de Pan*@
 @{
     ViewData["Breadcrumbs"] = new List<Dictionary<string, string>>
     {
@@ -15,6 +16,44 @@
         new() { { "Titulo", "Usuarios" }, { "Url", "Usuarios" } }
     };
     @await Html.PartialAsync("./Components/_BreadCrumb")
+}
+
+@{ // Aquí defines los campos del formulario dinámico
+    ViewData["CamposFormulario"] = new List<FormFieldViewModel>
+    {
+        new FormFieldViewModel
+        {
+            Container_Label = "Nombre",
+            Input_Type = "text",
+            Input_Placeholder = "Ingrese su nombre",
+            Form_Id = "txtNombre"
+        },
+        new FormFieldViewModel
+        {
+            Container_Label = "Apellido",
+            Input_Type = "text",
+            Input_Placeholder = "Ingrese su apellido",
+            Form_Id = "txtApellido"
+        },
+        new FormFieldViewModel
+        {
+            Container_Label = "Correo Electrónico",
+            Input_Type = "email",
+            Input_Placeholder = "Ingrese su correo",
+            Form_Id = "txtCorreo"
+        },
+        new FormFieldViewModel
+        {
+            Container_Label = "Activo",
+            Input_Type = "select",
+            Form_Id = "cboActivo",
+            Select_Options = new Dictionary<string, string>
+            {
+                { "1", "Sí" },
+                { "0", "No" }
+            }
+        }
+    };
 }
 
 <div class="card">

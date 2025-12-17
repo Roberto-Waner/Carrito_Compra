@@ -1,49 +1,45 @@
-﻿
-
-@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
     var idModal = ViewData["IdModal"] as string;
-    var modalTitle = ViewData["Titulo"] as string ?? "Titulos-Indefinido";
+    var modalTitle = ViewData["Titulo"] as string ?? "Titulos Indefinido";
+    var campoForm = ViewData["CamposFormulario"] as List<FormFieldViewModel> ?? new();
 
-    // 🔹 Aquí defines los campos del formulario dinámico
+    // Aquí defines los campos del formulario dinámico
 
-    var campoForm = new List<FormFieldViewModel>
-    {
-        new FormFieldViewModel
-        {
-            Container_Label = "Nombre",
-            Input_Type = "text",
-            Input_Placeholder = "Ingrese su nombre",
-            Form_Id = "txtNombre"
-        },
-        new FormFieldViewModel
-        {
-            Container_Label = "Apellido",
-            Input_Type = "text",
-            Input_Placeholder = "Ingrese su apellido",
-            Form_Id = "txtApellido"
-        },
-        new FormFieldViewModel
-        {
-            Container_Label = "Correo Electrónico",
-            Input_Type = "email",
-            Input_Placeholder = "Ingrese su correo",
-            Form_Id = "txtCorreo"
-        },
-        new FormFieldViewModel
-        {
-            Container_Label = "Activo",
-            Input_Type = "select",
-            Form_Id = "cboActivo",
-            Select_Options = new Dictionary<string, string>
-            {
-                { "1", "Sí" },
-                { "0", "No" }
-            }
-        }
-    };
+    // var campoForm = new List<FormFieldViewModel>
+    // {
+    //     new FormFieldViewModel
+    //     {
+    //         Container_Label = "Nombre",
+    //         Input_Type = "text",
+    //         Input_Placeholder = "Ingrese su nombre",
+    //         Form_Id = "txtNombre"
+    //     },
+    //     new FormFieldViewModel
+    //     {
+    //         Container_Label = "Apellido",
+    //         Input_Type = "text",
+    //         Input_Placeholder = "Ingrese su apellido",
+    //         Form_Id = "txtApellido"
+    //     },
+    //     new FormFieldViewModel
+    //     {
+    //         Container_Label = "Correo Electrónico",
+    //         Input_Type = "email",
+    //         Input_Placeholder = "Ingrese su correo",
+    //         Form_Id = "txtCorreo"
+    //     },
+    //     new FormFieldViewModel
+    //     {
+    //         Container_Label = "Activo",
+    //         Input_Type = "select",
+    //         Form_Id = "cboActivo",
+    //         Select_Options = new Dictionary<string, string>
+    //         {
+    //             { "1", "Sí" },
+    //             { "0", "No" }
+    //         }
+    //     }
+    // };
 }
 
 <!-- Modal -->
