@@ -23,21 +23,42 @@
 
 @model FormFieldViewModel
 
-<div class="col-sm-6">
-    <label for="@Model.Form_Id" class="form-label">@Model.Container_Label</label>
+@if (!string.IsNullOrEmpty(Model.IdLabel))
+{
+    <label id="@Model.IdLabel"
+            for="@Model.Name" 
+            class="@(Model.Input_IsRequired ? "required" : "") form-label"
+    >@Model.Container_Label</label>
+}
 
-    @if (Model.Input_Type == "select" && Model.Select_Options != null)
-    {
-        <select class="form-select" aria-label="Default select example" id="@Model.Form_Id">
-            @foreach (var option in Model.Select_Options)
-            {
-                <option value="@option.Key">@option.Value</option>
-            }
-        </select>
-    }
-    else
-    {
-        <input type="@Model.Input_Type" class="form-control" id="@Model.Form_Id" placeholder="@Model.Input_Placeholder">
-        @* <input type="@Model.Input_Type" class="form-control" id="@Model.Form_Id" placeholder="@Model.Input_Placeholder" autocomplete="off"> *@
-    }
-</div>
+@if (Model.Input_Type == "select" && Model.Select_Options != null)
+{
+    <select id="@Model.IdInput" name="@Model.Name" class="form-select" aria-label="Default select example">
+        @foreach (var option in Model.Select_Options)
+        {
+            <option value="@option.Key">@option.Value</option>
+        }
+    </select>
+}
+else if (Model.ColTexTarea != null || Model.RowTexTarea != null)
+{
+    <textarea id="@Model.IdInput"
+            name="@Model.Name"
+            class="form-control"
+            rows="@Model.RowTexTarea"
+            cols="@Model.ColTexTarea"
+            placeholder="@Model.Placeholder"
+            @(Model.Input_IsRequired ? "required" : "")
+            autocomplete="on"></textarea>
+}
+else
+{
+    <input id="@Model.IdInput"
+            name="@Model.Name" 
+            type="@Model.Input_Type" 
+            class="form-control" 
+            placeholder="@Model.Placeholder"
+            @(Model.Input_IsRequired ? "required" : "") 
+            autocomplete="on">
+    @* <input type="@Model.Input_Type" class="form-control" id="@Model.Form_Id" placeholder="@Model.Input_Placeholder" autocomplete="off"> *@
+}

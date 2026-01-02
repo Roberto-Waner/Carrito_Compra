@@ -21,32 +21,51 @@
 @{ // Aquí defines los campos del formulario dinámico
     ViewData["CamposFormulario"] = new List<FormFieldViewModel>
     {
-        new FormFieldViewModel
+        new ()
         {
+            //Label del contenedor
+            IdLabel = "lblNombre",
+            Name = "nombres",
             Container_Label = "Nombre",
+            //Tipo de input
+            IdInput = "txtNombre",
             Input_Type = "text",
-            Input_Placeholder = "Ingrese su nombre",
-            Form_Id = "txtNombre"
+            Placeholder = "Ingrese su nombre",
+            Input_IsRequired = true
         },
-        new FormFieldViewModel
+        new ()
         {
+            //Label del contenedor
+            IdLabel = "lblApellido",
+            Name = "apellido",
             Container_Label = "Apellido",
+            //Tipo de input
+            IdInput = "txtApellido",
             Input_Type = "text",
-            Input_Placeholder = "Ingrese su apellido",
-            Form_Id = "txtApellido"
+            Placeholder = "Ingrese su apellido",
+            Input_IsRequired = true
         },
-        new FormFieldViewModel
+        new ()
         {
+            //Label del contenedor
+            IdLabel = "lblEmail",
+            Name = "email",
             Container_Label = "Correo Electrónico",
+            //Tipo de input
+            IdInput = "txtCorreo",
             Input_Type = "email",
-            Input_Placeholder = "Ingrese su correo",
-            Form_Id = "txtCorreo"
+            Placeholder = "Ingrese su correo",
+            Input_IsRequired = true
         },
-        new FormFieldViewModel
+        new ()
         {
+            //Label del contenedor
+            IdLabel = "lblAct",
+            Name = "active",
             Container_Label = "Activo",
+            //Tipo de input
+            IdInput = "cboActivo",
             Input_Type = "select",
-            Form_Id = "cboActivo",
             Select_Options = new Dictionary<string, string>
             {
                 { "1", "Sí" },

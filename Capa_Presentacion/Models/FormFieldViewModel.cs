@@ -2,13 +2,20 @@
 {
     public class FormFieldViewModel
     {
+        public string? IdInput { get; set; }
+        public string? Name { get; set; }
+        public string? Placeholder { get; set; }
+        //Laber
+        public string? IdLabel { get; set; }
+        //public bool IncludLabel { get; set; }
         public string? Container_Label { get; set; }
+        //Input
         public string? Input_Type { get; set; }
-        public string? Form_Id { get; set; }
-        //public string? Label_Id { get; set; }
-        //public string? Input_Id { get; set; }
-        public string? Input_Placeholder { get; set; }
-        //public string? Select_Id { get; set; }
+        public bool Input_IsRequired { get; set; }
+        //Textarea
+        public string? ColTexTarea { get; set; }
+        public string? RowTexTarea { get; set; }
+        //Select
         public Dictionary<string, string>? Select_Options { get; set; }
     }
 }

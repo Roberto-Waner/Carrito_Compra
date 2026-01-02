@@ -2,6 +2,7 @@
     var idModal = ViewData["IdModal"] as string;
     var modalTitle = ViewData["Titulo"] as string ?? "Titulos Indefinido";
     var campoForm = ViewData["CamposFormulario"] as List<FormFieldViewModel> ?? new();
+    // var btnForm = ViewData["CamposFormulario"] as List<FormFieldViewModel> ?? new();
 
     // Aquí defines los campos del formulario dinámico
 
@@ -85,12 +86,26 @@
                 </div> *@
 
                 @* @model List<FormFieldViewModel> *@
-                <div id="formWrapper">
-                    <div id="formContainer" class="row g-3">
+                <div id="formWrapper" class="w-100">
+                    <div id="formContainer" class="row g-3 justify-content-start">
                     
                         @foreach (var camp in campoForm)
                         {
-                            @await Html.PartialAsync("./Components/_FormControl", camp)
+                            
+                            string colClass = "col-12";
+
+                            if(campoForm.Count >= 4)
+                            {
+                                colClass = "col-12 col-md-6";  // 2 por fila (como en Usuario)
+                            }
+                            else
+                            {
+                                colClass = "col-12";   // 1 solo campo: más estrecho y centrado
+                            }
+
+                            <div class="@colClass">
+                                @await Html.PartialAsync("./Components/_FormControl", camp)
+                            </div>
                         }
                     </div>
 
