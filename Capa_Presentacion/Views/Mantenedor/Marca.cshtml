@@ -1,8 +1,358 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Marca";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Marca</h1>
+@{
+    ViewData["Breadcrumbs"] = new List<Dictionary<string, string>>
+    {
+        new() { { "Titulo", "Mantenimiento" }, { "Url", "#" } },
+        new() { { "Titulo", "Marca" }, { "Url", "Marca" } }
+    };
+    @await Html.PartialAsync("./Components/_BreadCrumb")
+}
 
+@{
+    // Aquí defines los campos del formulario dinámico
+    ViewData["CamposFormulario"] = new List<FormFieldViewModel>
+    {
+        new ()
+        {
+            //Label del contenedor
+            IdLabel = "lblDesc",
+            Name = "description",
+            Container_Label = "Descripción",
+            //Textarea
+            IdInput = "txtDesc",
+            Placeholder = "Ingrese la descripción",
+            // Input_Type = "text",
+            RowTexTarea = "4",
+            ColTexTarea = "1",
+            Input_IsRequired = true
+        },
+        new ()
+        {
+            //Label del contenedor
+            IdLabel = "lblAct",
+            Name = "active",
+            Container_Label = "Activo",
+            //Tipo de input
+            IdInput = "cboActivo",
+            Input_Type = "select",
+            Select_Options = new Dictionary<string, string>
+            {
+                { "1", "Sí" },
+                { "0", "No" }
+            }
+        }
+    };
+}
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Lista de Marcas
+    </div>
+    <div class="card-body position-relative">
+        <div class="row">
+            <div class="col-12">
+                @{
+                    ViewData["IdModal"] = "FormModalMarca";
+                    ViewData["Titulo"] = "Agregar Nueva Marca";
+                }
+                @await Html.PartialAsync("./Components/_ModalView")
+
+                <button type="button" id="btnGuardar" class="btn btn-success px-3" data-bs-toggle="modal" data-bs-target="#FormModalMarca">Nueva Marca <i class="fas fa-user ms-2"></i></button>
+            </div>
+        </div>
+
+        @*<hr />*@
+
+        <div id="tablaContainer" class="border-top border-dark mt-3 pb-4">
+            <table id="idTabla" class="table table-hover table-bordered align-middle text-secondary" style="width: 100%">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Descripción</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody" class="text-secondary"></tbody>
+            </table>
+
+            <!-- 🟢 Spinner para la tabla -->
+            <div id="spinnerTabla"
+                 class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75"
+                 style="z-index:1050; border-radius:0.375rem;">
+                @await Html.PartialAsync("./Components/_Spinner")
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .swal2-confirm{ margin-left: 5px; }
+
+    .swal2-cancel{ margin-right: 5px; }
+
+    .sk-cube-grid {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 15px auto !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        let modoEdicion = false;
+        let idMarcaEditando = 0;
+
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "bottom-end",
+          showConfirmButton: false,
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false,
+            reverseButtons: true,
+            focusConfirm: false
+        });
+
+        //--------------------------------------------------------------------------------------------
+        //Traer los datos a la tabla
+        $(document).ready(function () {
+            const $spinner = $('#spinnerTabla');
+
+            // 🔹 Mostrar spinner antes de comenzar
+            $spinner.removeClass('d-none');
+
+            $.get({ //Metodo para listar las categorias
+                url: '@Url.Action("ListarMarcas", "Mantenedor")',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8'
+            })
+            .done(function (data) {
+                var $tbody = $('#tableBody').empty();
+
+                $.each(data.listOfMarca, function(_, m) {
+                    $tbody.append(
+                        $('<tr>').append(
+                            $('<td>').addClass('pt-2').text(m.description),
+                            $('<td>').addClass('pt-2').append(
+                                m.activo
+                                    ? $('<span>').addClass('badge bg-success').text('Sí')
+                                    : $('<span>').addClass('badge bg-danger').text('No')
+                            ),
+                            $('<td>').addClass('pt-2').append(
+                                $('<button>')
+                                    .addClass('btn btn-primary btn-sm btn-editar')
+                                    .attr({
+                                        'data-id': m.idMarca,
+                                        'data-description': m.description,
+                                        'data-activo': m.activo
+                                    })
+                                    .html('<i class="fas fa-pen"></i>'),
+                                $('<button>')
+                                    .addClass('btn btn-danger btn-sm ms-1 btn-eliminar') // Boton de Eliminar
+                                    .attr('data-id', m.idMarca)
+                                    .append($('<i>').addClass('fas fa-trash')) // icono de Eliminar
+                            )
+                        )
+                    );
+                });
+
+                let dataTable = {
+                    responsive: true,
+                    ordering: false,
+                    language: {
+                        url: '//cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                    },
+                    columnDefs: [
+                        {
+                            targets: 2,
+                            orderable: false, // No se puede ordenar con clic
+                            searchable: false, // No se incluye en la búsqueda
+                            width: "100px" //Fija el ancho a 90px
+                        }
+                    ]
+                }
+
+                new DataTable('#idTabla', dataTable);
+            })
+            .fail(function (xhr) {
+                console.error('Error al cargar las marcas:', xhr);
+            })
+            .always(function () {
+                // 🔹 Ocultar el spinner siempre (éxito o error)
+                $spinner.addClass('d-none');
+            });
+        });
+
+        //--------------------------------------------------------------------------------------------
+        //Para invocar el modal en modo edición
+        $('#idTabla #tableBody').on("click", '.btn-editar', function() {
+            modoEdicion = true;
+            idMarcaEditando = $(this).data('id');
+            // console.log(idCategoriaEditando);
+
+            // Rellena los campos del modal
+            $('#txtDesc').val($(this).data('description'));
+            $('#cboActivo').val($(this).data('activo') ? "1" : "0");
+
+            // Cambia el título del modal
+            $('#modalTitle').text('Editar Marca');
+
+            $('#ErrorMessege').hide(); //para remover el error al dejar el input vacio
+
+            // Muestra el modal
+            $('#FormModalMarca').modal('show');
+        });
+        //--------------------------------------------------------------------------------------------
+
+        //--------------------------------------------------------------------------------------------
+        // Metodo para eliminar datos
+        $("#idTabla #tableBody").on("click", '.btn-eliminar', function() {
+            let id = $(this).data('id');
+
+            swalWithBootstrapButtons.fire({
+                title: "¿Estás seguro?",
+                text: "¡No podrás revertir esta acción!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa fa-check"></i> Sí, eliminar',
+                cancelButtonText: '<i class="fa fa-times"></i> No, cancelar',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+            }).then((result) => {
+                if(result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Eliminando...',
+                        html: `
+                                <div class="">
+                                    @await Html.PartialAsync("./Components/_Spinner")
+                                    <p class="mt-3 mb-0 text-muted">Por favor espera</p>
+                                </div>
+                              `,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false
+                    });
+
+                    $.post('@Url.Action("EliminarMarca", "Mantenedor")', {id: id})
+                        .done(function (resp) {
+                            if(resp.resultado != 0){
+                                swalWithBootstrapButtons.fire({
+                                    title: "¡Eliminado!",
+                                    text: "La marca ha sido eliminado correctamente.",
+                                    icon: "success",
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload(); // Recarga la página o actualiza la tabla
+                                });
+                            } else {
+                                swalWithBootstrapButtons.fire({
+                                    title: "Error",
+                                    text: "No se pudo eliminar la marca: " + (resp.mensaje || "Error desconocido"),
+                                    icon: "error"
+                                });
+                            }
+                        })
+                        .fail(function (xhr) {
+                            console.error('Error AJAX:', xhr);
+                            swalWithBootstrapButtons.fire({
+                                title: "Error del servidor",
+                                text: "No se pudo conectar con el servidor. Inténtalo más tarde.",
+                                icon: "error"
+                            });
+                        })
+
+                }
+                else if (result.dismiss === Swal.DismissReason.cancel)
+                {
+                    swalWithBootstrapButtons.fire({
+                        title: "Cancelado",
+                        text: "La marca está a salvo 😊",
+                        icon: "error",
+                        timer: 1800,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        });
+
+        //--------------------------------------------------------------------------------------------
+        // Limpiar los campos
+        $('#btnGuardar').on('click', function () {
+            modoEdicion = false;
+            idMarcaEditando = null;
+
+            // Limpia los campos para nuevo registro
+            $('#txtDesc').val('');
+            $('#cboActivo').val('1');
+
+            $('#modalTitle').text('Agregar Nueva Marca');
+            $('#ErrorMessege').hide();
+            $('#FormModalMarca').modal('show');
+        });
+        //--------------------------------------------------------------------------------------------
+
+        //--------------------------------------------------------------------------------------------
+        // llamada del id del boton de guardar en el modal "_ModalView"
+        $('#btnModalSave').on('click', function() {
+            const Marca = {
+                idMarca: idMarcaEditando || 0,
+                description: $('#txtDesc').val(),
+                activo: $('#cboActivo').val() === "1"
+            };
+
+            // Mostrar spinner
+            $('#spinnerLoad').removeClass('d-none');
+
+            $.post('@Url.Action("GuardarMarca", "Mantenedor")', Marca)
+                .done(function (resp) {
+                    if(resp.resultado != 0) {
+                        Toast.fire({
+                            icon: "success",
+                            title: "Guardando Marca"
+                        }).then(() => {
+                            location.reload();
+                        });
+
+                        $('#FormModalMarca').modal('hide');
+                    } else {
+                        Toast.fire({
+                            icon: "warning",
+                            title: resp.mensaje
+                        });
+
+                        $('#ErrorMessege').text(resp.mensaje).show();
+                    }
+                })
+                .fail(function (xhr) {
+                    console.error('Error al guardar la marca:', xhr);
+                    Toast.fire({
+                        icon: "error",
+                        title: "Error al guardar la marca"
+                    });
+                    // alert("❌ Error al guardar la categoria");
+                })
+                .always(function() {
+                    // Ocultar spinner siempre (éxito o error)
+                    $('#spinnerLoad').addClass('d-none');
+                });
+        });
+
+    </script>
+}

@@ -49,6 +49,35 @@ namespace Capa_Presentacion.Controllers
             return View();
         }
 
+        [HttpGet]
+        public JsonResult ListarMarcas()
+        {
+            List<Marca> oLista = new();
+            oLista = new CN_Marcas().Listar();
+            return Json(new { listOfMarca = oLista });
+        }
+
+        [HttpPost]
+        public JsonResult GuardarMarca(Marca objeto)
+        {
+            object resultado;
+            string mensaje;
+
+            if (objeto.idMarca == 0) resultado = new CN_Marcas().Registrar(objeto, out mensaje);
+            else resultado = new CN_Marcas().Editar(objeto, out mensaje);
+
+            return Json(new { resultado = resultado, mensaje = mensaje });
+        }
+
+        [HttpPost]
+        public JsonResult EliminarMarca(int id)
+        {
+            bool resultado = false;
+            string mensaje;
+            resultado = new CN_Marcas().Eliminar(id, out mensaje);
+            return Json(new { resultado = resultado, mensaje = mensaje });
+        }
+
         #endregion
 
         #region Producto
