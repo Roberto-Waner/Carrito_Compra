@@ -2,6 +2,7 @@
     var idModal = ViewData["IdModal"] as string;
     var modalTitle = ViewData["Titulo"] as string ?? "Titulos Indefinido";
     var campoForm = ViewData["CamposFormulario"] as List<FormFieldViewModel> ?? new();
+    var classForm = ViewData["ClassForm"] as string;
     // var btnForm = ViewData["CamposFormulario"] as List<FormFieldViewModel> ?? new();
 
     // Aquí defines los campos del formulario dinámico
@@ -45,7 +46,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="@idModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog">
+    <div id="modalDialog" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-dark text-white border-0">
                 <h1 class="modal-title fs-5" id="modalTitle">@modalTitle</h1>
@@ -91,19 +92,21 @@
                     
                         @foreach (var camp in campoForm)
                         {
-                            
-                            string colClass = "col-12";
+                            @*
+                                string colClass = "col-12";
 
-                            if(campoForm.Count >= 4)
-                            {
-                                colClass = "col-12 col-md-6";  // 2 por fila (como en Usuario)
-                            }
-                            else
-                            {
-                                colClass = "col-12";   // 1 solo campo: más estrecho y centrado
-                            }
+                                if(campoForm.Count >= 4)
+                                {
+                                    colClass = "col-12 col-md-6";  // 2 por fila (como en Usuario)
+                                }
+                                else
+                                {
+                                    colClass = "col-12";   // 1 solo campo: más estrecho y centrado
+                                }
+                            *@
 
-                            <div class="@colClass">
+                            // <div class="@colClass">
+                            <div class="@classForm">
                                 @await Html.PartialAsync("./Components/_FormControl", camp)
                             </div>
                         }

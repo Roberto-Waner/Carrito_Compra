@@ -49,16 +49,40 @@ else if (Model.ColTexTarea != null || Model.RowTexTarea != null)
             cols="@Model.ColTexTarea"
             placeholder="@Model.Placeholder"
             @(Model.Input_IsRequired ? "required" : "")
-            autocomplete="on"></textarea>
+          @(Model.AutoComplete ? "autocomplete=on" : "autocomplete=off")>
+    </textarea>
 }
 else
 {
-    <input id="@Model.IdInput"
-            name="@Model.Name" 
-            type="@Model.Input_Type" 
-            class="form-control" 
-            placeholder="@Model.Placeholder"
-            @(Model.Input_IsRequired ? "required" : "") 
-            autocomplete="on">
-    @* <input type="@Model.Input_Type" class="form-control" id="@Model.Form_Id" placeholder="@Model.Input_Placeholder" autocomplete="off"> *@
+    if (Model.Input_Type == "file")
+    {
+        <input id="@Model.IdInput"
+               name="@Model.Name"
+               type="@Model.Input_Type"
+               class="form-control"
+               placeholder="@Model.Placeholder"
+               @(Model.Input_IsRequired ? "required" : "")
+               @(Model.AutoComplete ? "autocomplete=on" : "autocomplete=off")
+               @* autocomplete="on" *@
+               accept="image/png, image/jpg, image/jpeg"
+               onchange=""
+        />
+    }
+    else
+    {
+        <input id="@Model.IdInput"
+               name="@Model.Name" 
+               type="@Model.Input_Type" 
+               class="form-control" 
+               placeholder="@Model.Placeholder"
+               @(Model.Input_IsRequired ? "required" : "")
+               @(Model.AutoComplete ? "autocomplete=on" : "autocomplete=off") />
+    }
+}
+
+@if (Model.Input_Type == "file")
+{
+    <div class="mb-2">
+        <img id="@Model.IdInput" class="border rounded mx-auto d-block img-fluid"  />
+    </div>
 }

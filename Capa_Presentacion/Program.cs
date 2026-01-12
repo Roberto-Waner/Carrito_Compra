@@ -14,6 +14,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(); // Sirve archivos de wwwroot
+
 app.UseRouting();
 
 app.UseAuthorization();

@@ -1,8 +1,191 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Producto";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Producto</h1>
+@{
+    ViewData["Breadcrumbs"] = new List<Dictionary<string, string>>
+    {
+        new() { { "Titulo", "Mantenimiento" }, { "Url", "#" } },
+        new() { { "Titulo", "Producto" }, { "Url", "Producto" } }
+    };
+    @await Html.PartialAsync("./Components/_BreadCrumb")
+}
 
+@{
+    // Aquí defines los campos del formulario dinámico
+    ViewData["ClassForm"] = "col-12 col-lg-6";
+
+    ViewData["CamposFormulario"] = new List<FormFieldViewModel>
+    {
+        new () //Nombre
+        {
+            //Label del contenedor
+            IdLabel = "lblNombre",
+            Name = "nombres",
+            Container_Label = "Nombre",
+            //Tipo de input
+            IdInput = "txtNombre",
+            Input_Type = "text",
+            Placeholder = "Ingrese el nombre del producto",
+            Input_IsRequired = true,
+            AutoComplete = true
+        },
+        new () //Descripcion
+        {
+            //Label del contenedor
+            IdLabel = "lblDesc",
+            Name = "description",
+            Container_Label = "Descripción",
+            //Textarea
+            IdInput = "txtDesc",
+            Placeholder = "Ingrese la descripción",
+            // Input_Type = "text",
+            RowTexTarea = "2",
+            ColTexTarea = "1",
+            Input_IsRequired = false,
+            AutoComplete = true
+        },
+        new () //Marca
+        {
+            //Label del contenedor
+            IdLabel = "lblMarca",
+            Name = "marca",
+            Container_Label = "Marca",
+            //Tipo de input
+            IdInput = "cboMarca",
+            Input_Type = "select",
+            Select_Options = new Dictionary<string, string>
+            {
+                { "1", "Sí" },
+                { "0", "No" }
+            }
+        },
+        new () //Categoria
+        {
+            //Label del contenedor
+            IdLabel = "lblCategoria",
+            Name = "categoria",
+            Container_Label = "Categoria",
+            //Tipo de input
+            IdInput = "cboCategoria",
+            Input_Type = "select",
+            Select_Options = new Dictionary<string, string>
+            {
+                { "1", "Sí" },
+                { "0", "No" }
+            }
+        },
+        new () //Precio
+        {
+            //Label del contenedor
+            IdLabel = "lblPrecio",
+            Name = "precio",
+            Container_Label = "Precio",
+            //Tipo de input
+            IdInput = "txtPrecio",
+            Input_Type = "text",
+            Placeholder = "Ingrese el Precio del producto",
+            Input_IsRequired = true,
+            AutoComplete = false
+        },
+        new () //Stock
+        {
+            //Label del contenedor
+            IdLabel = "lblStock",
+            Name = "stock",
+            Container_Label = "Stock",
+            //Tipo de input
+            IdInput = "txtStock",
+            Input_Type = "text",
+            Placeholder = "Stock disponible del producto",
+            Input_IsRequired = true,
+            AutoComplete = true
+        },
+        new () //Activo
+        {
+            //Label del contenedor
+            IdLabel = "lblAct",
+            Name = "active",
+            Container_Label = "Activo",
+            //Tipo de input
+            IdInput = "cboActivo",
+            Input_Type = "select",
+            Select_Options = new Dictionary<string, string>
+            {
+                { "1", "Sí" },
+                { "0", "No" }
+            }
+        }
+    };
+}
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-boxes me-1"></i> Lista de Productos
+    </div>
+    <div class="card-body position-relative">
+        <div class="row">
+            <div class="col-12">
+                @{
+                    ViewData["IdModal"] = "FormModalProducto";
+                    ViewData["Titulo"] = "Agregar Nuevo Producto";
+                }
+                @await Html.PartialAsync("./Components/_ModalView")
+
+                <button type="button" id="btnGuardar" class="btn btn-success px-3" data-bs-toggle="modal" data-bs-target="#FormModalProducto">Nuevo Producto <i class="fas fa-boxes ms-2"></i></button>
+            </div>
+        </div>
+
+        @*<hr />*@
+
+        <div id="tablaContainer" class="border-top border-dark mt-3 pb-4">
+            <table id="idTabla" class="table table-hover table-bordered align-middle text-secondary" style="width: 100%">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Marca</th>
+                        <th>Categoria</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Activo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tableBody" class="text-secondary"></tbody>
+            </table>
+
+            <!-- 🟢 Spinner para la tabla -->
+            @*
+                <div id="spinnerTabla"
+                     class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75"
+                     style="z-index:1050; border-radius:0.375rem;">
+                    @await Html.PartialAsync("./Components/_Spinner")
+                </div>
+            *@
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .swal2-confirm { margin-left: 5px; }
+
+    .swal2-cancel { margin-right: 5px; }
+
+    .sk-cube-grid {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 15px auto !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#modalDialog').addClass('modal-xl');
+        });
+    </script>
+}

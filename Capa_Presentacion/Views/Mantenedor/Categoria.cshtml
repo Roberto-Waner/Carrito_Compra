@@ -14,6 +14,8 @@
 
 @{
     // Aquí defines los campos del formulario dinámico
+    ViewData["ClassForm"] = "col-12";
+
     ViewData["CamposFormulario"] = new List<FormFieldViewModel>
     {
         new ()
@@ -28,7 +30,8 @@
             // Input_Type = "text",
             RowTexTarea = "4",
             ColTexTarea = "1",
-            Input_IsRequired = true
+            Input_IsRequired = true,
+            AutoComplete = true
         },
         new ()
         {

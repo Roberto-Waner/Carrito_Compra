@@ -18,7 +18,10 @@
     @await Html.PartialAsync("./Components/_BreadCrumb")
 }
 
-@{ // Aquí defines los campos del formulario dinámico
+@{
+    // Aquí defines los campos del formulario dinámico
+    ViewData["ClassForm"] = "col-12 col-md-6";
+
     ViewData["CamposFormulario"] = new List<FormFieldViewModel>
     {
         new ()
@@ -31,7 +34,8 @@
             IdInput = "txtNombre",
             Input_Type = "text",
             Placeholder = "Ingrese su nombre",
-            Input_IsRequired = true
+            Input_IsRequired = true,
+            AutoComplete = true
         },
         new ()
         {
@@ -43,7 +47,8 @@
             IdInput = "txtApellido",
             Input_Type = "text",
             Placeholder = "Ingrese su apellido",
-            Input_IsRequired = true
+            Input_IsRequired = true,
+            AutoComplete = true
         },
         new ()
         {
@@ -55,7 +60,8 @@
             IdInput = "txtCorreo",
             Input_Type = "email",
             Placeholder = "Ingrese su correo",
-            Input_IsRequired = true
+            Input_IsRequired = true,
+            AutoComplete = true
         },
         new ()
         {

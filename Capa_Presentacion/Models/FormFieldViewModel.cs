@@ -11,6 +11,7 @@
         public string? Container_Label { get; set; }
         //Input
         public string? Input_Type { get; set; }
+        public bool AutoComplete { get; set; }
         public bool Input_IsRequired { get; set; }
         //Textarea
         public string? ColTexTarea { get; set; }

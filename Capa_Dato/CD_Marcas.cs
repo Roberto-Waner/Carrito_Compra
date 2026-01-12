@@ -18,7 +18,7 @@ namespace Capa_Datos
 
                 string query = "select idMarca, description, activo from MARCA";
                 SqlCommand cmd = new SqlCommand(query, oConexion);
-                cmd.CommandType = System.Data.CommandType.Text;
+                cmd.CommandType = CommandType.Text;
 
                 using SqlDataReader reader = cmd.ExecuteReader();
                 while (reader.Read())
