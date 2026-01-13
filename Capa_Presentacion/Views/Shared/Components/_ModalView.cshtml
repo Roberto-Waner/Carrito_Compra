@@ -46,13 +46,13 @@
 
 <!-- Modal -->
 <div class="modal fade" id="@idModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
-    <div id="modalDialog" class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-dark text-white border-0">
+    <div id="modalDialog" class="modal-dialog modal-dialog-scrollable">
+        <div id="modalContent" class="modal-content">
+            <div id="modalHeader" class="modal-header bg-dark text-white border-0">
                 <h1 class="modal-title fs-5" id="modalTitle">@modalTitle</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body position-relative d-flex align-items-center justify-content-center">
+            <div id="modalBody" class="modal-body position-relative">
                 <div id="spinnerLoad"
                      class="position-absolute w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center d-none"
                      style="z-index: 1055;">
@@ -106,7 +106,8 @@
                             *@
 
                             // <div class="@colClass">
-                            <div class="@classForm">
+                            // <div class="@classForm">
+                            <div class="@(string.IsNullOrEmpty(camp.CustomColumnClass) ? classForm : camp.CustomColumnClass)">
                                 @await Html.PartialAsync("./Components/_FormControl", camp)
                             </div>
                         }
@@ -129,6 +130,13 @@
         </div>
     </div>
 </div>
+
+<style>
+    #modalBody {
+        max-height: 65vh; /* o 70vh, ajusta según tu header/footer */
+        overflow-y: auto; /* scroll solo vertical cuando sea necesario */
+    }
+</style>
 
 @*
 @section Scripts {

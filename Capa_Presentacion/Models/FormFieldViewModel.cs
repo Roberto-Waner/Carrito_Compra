@@ -5,6 +5,7 @@
         public string? IdInput { get; set; }
         public string? Name { get; set; }
         public string? Placeholder { get; set; }
+        public string? CustomColumnClass { get; set; }
         //Laber
         public string? IdLabel { get; set; }
         //public bool IncludLabel { get; set; }

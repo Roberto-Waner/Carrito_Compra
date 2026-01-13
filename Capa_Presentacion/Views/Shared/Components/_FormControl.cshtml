@@ -1,27 +1,4 @@
-﻿@* @{
-    var labelTitle = ViewData["label-title"] as string;
-    var inputType = ViewData["type"] as string;
-    var idInput = ViewData["id-input"] as string;
-    var placeholderInput = ViewData["placeholder-input"] as string;
-}
-
-<div class="col-sm-6">
-    <label for="exampleFormControlInput1" class="form-label">@labelTitle</label>
-    <input type="@inputType" class="form-control" id="@idInput" placeholder="@placeholderInput">
-</div>
-
-@{
-
-}
-<div class="col-sm-6">
-    <label for="exampleFormControlInput1" class="form-label">@labelTitle</label>
-    <select class="form-select" aria-label="Default select example">
-        <option value="1">Si</option>
-        <option value="0">No</option>
-    </select>
-</div> *@
-
-@model FormFieldViewModel
+﻿@model FormFieldViewModel
 
 @if (!string.IsNullOrEmpty(Model.IdLabel))
 {
@@ -56,17 +33,29 @@ else
 {
     if (Model.Input_Type == "file")
     {
-        <input id="@Model.IdInput"
-               name="@Model.Name"
-               type="@Model.Input_Type"
-               class="form-control"
-               placeholder="@Model.Placeholder"
-               @(Model.Input_IsRequired ? "required" : "")
-               @(Model.AutoComplete ? "autocomplete=on" : "autocomplete=off")
-               @* autocomplete="on" *@
-               accept="image/png, image/jpg, image/jpeg"
-               onchange=""
-        />
+        <div class="content-file w-100">
+            <div class="imgStyle overflow-hidden border rounded bg-light d-flex align-items-center justify-content-center mb-2">
+                <img id="idImage"
+                     class="product-preview object-fit-contain img-fluid d-none"
+                     src=""
+                     alt="Vista previa" />
+
+                <div class="placeholder-text text-muted text-center">
+                    <i class="fas fa-image fa-3x mb-2"></i>
+                    <div>No hay una imagen para este producto</div>
+                </div>
+            </div>
+
+            <input id="@Model.IdInput"
+                   name="@Model.Name"
+                   type="@Model.Input_Type"
+                   class="form-control"
+                   placeholder="@Model.Placeholder"
+                   @(Model.Input_IsRequired ? "required" : "")
+                   @(Model.AutoComplete ? "autocomplete=on" : "autocomplete=off")
+                   accept="image/png, image/jpg, image/jpeg"
+                   onchange="previewImage(this)" />
+        </div>
     }
     else
     {
@@ -80,9 +69,16 @@ else
     }
 }
 
-@if (Model.Input_Type == "file")
-{
-    <div class="mb-2">
-        <img id="@Model.IdInput" class="border rounded mx-auto d-block img-fluid"  />
-    </div>
-}
+<style>
+    .imgStyle {
+        height: 300px !important;
+        /* overflow: hidden !important; */
+        border-radius: 0.375rem;
+    }
+
+    .product-preview{
+        width: 100%;
+        height: 100%;
+        /* object-fit: contain; */
+    }
+</style>

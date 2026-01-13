@@ -116,6 +116,21 @@
                 { "1", "Sí" },
                 { "0", "No" }
             }
+        },
+        new () //Imagen del producto
+        {
+            //Label del contenedor
+            IdLabel = "lblProducto",
+            Name = "producto",
+            Container_Label = "Imagen del Producto",
+            //Tipo de input
+            IdInput = "fileProducto",
+            Input_Type = "file",
+            Placeholder = "Selecione la imagen del producto",
+            Input_IsRequired = false,
+            AutoComplete = false,
+            //para aplicarle su column de manera independiente
+            CustomColumnClass = "col-12"   // ← Esto lo pone full width siempre
         }
     };
 }
@@ -158,13 +173,13 @@
             </table>
 
             <!-- 🟢 Spinner para la tabla -->
-            @*
-                <div id="spinnerTabla"
-                     class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75"
-                     style="z-index:1050; border-radius:0.375rem;">
-                    @await Html.PartialAsync("./Components/_Spinner")
-                </div>
-            *@
+            
+            <div id="spinnerTabla"
+                    class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-75"
+                    style="z-index:1050; border-radius:0.375rem;">
+                @await Html.PartialAsync("./Components/_Spinner")
+            </div>
+            
         </div>
 
     </div>
@@ -185,7 +200,44 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#modalDialog').addClass('modal-xl');
+            $('#modalDialog').addClass('modal-lg');
+
+            $(document).on('change', 'input[type="file"]', function () {
+                previewImage(this);
+            });
         });
+
+        function previewImage(input){
+            var $container = $(input).closest('.content-file');
+
+            if ($container.length === 0) {
+                console.log("No se encontró .content-file");
+                return;
+            }
+
+            var $preview = $container.find('.product-preview');
+            var $placeholder = $container.find('.placeholder-text');
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $preview
+                        .attr('src', e.target.result)
+                        .removeClass('d-none');
+
+                    // Ocultamos el placeholder
+                    $placeholder.addClass('d-none');
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                $preview
+                    .attr('src', '')
+                    .addClass('d-none');
+
+                $placeholder.removeClass('d-none');
+            }
+        }
     </script>
 }
