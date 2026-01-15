@@ -95,6 +95,30 @@ namespace Capa_Presentacion.Controllers
         #region Producto
         public ActionResult Producto()
         {
+            //Cargar las Marcas
+            //var marcas = new CN_Marcas().Listar();
+            //var listBrands = marcas.Select(m => new { Value = m.idMarca.ToString(), Text = m.description }).ToList();
+
+            //ViewBag.ListarMarcas = listBrands;
+            ViewBag.ListarMarcas = new CN_Marcas()
+                .Listar()
+                .ToDictionary(
+                    m => m.idMarca.ToString(),
+                    m => m.description
+                );
+
+            //Cargar las Categorias
+            //var categorias = new CN_Categoria().Listar();
+            //var listCtgries = categorias.Select(c => new { Value = c.idCategoria.ToString(), Text = c.description }).ToList();
+
+            //ViewBag.ListarCategorias = listCtgries;
+            ViewBag.ListarCategorias = new CN_Categoria()
+                .Listar()
+                .ToDictionary(
+                    c => c.idCategoria.ToString(),
+                    c => c.description
+                );
+
             return View();
         }
 

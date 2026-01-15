@@ -8,13 +8,28 @@
     >@Model.Container_Label</label>
 }
 
-@if (Model.Input_Type == "select" && Model.Select_Options != null)
+@* @if (Model.Input_Type == "select" && Model.Select_Options != null)
 {
     <select id="@Model.IdInput" name="@Model.Name" class="form-select" aria-label="Default select example">
         @foreach (var option in Model.Select_Options)
         {
             <option value="@option.Key">@option.Value</option>
         }
+    </select>
+} *@
+@if (Model.Input_Type == "select")
+{
+    <select id="@Model.IdInput" name="@Model.Name" class="form-select" aria-label="Default select example">
+        <option value="">Seleccione...</option>
+
+        @if (Model.Select_Options != null)
+        {
+            @foreach (var option in Model.Select_Options)
+            {
+                <option value="@option.Key">@option.Value</option>
+            }
+        }
+
     </select>
 }
 else if (Model.ColTexTarea != null || Model.RowTexTarea != null)
@@ -82,3 +97,32 @@ else
         /* object-fit: contain; */
     }
 </style>
+
+<script> 
+    function previewImage(input){
+        var $container = $(input).closest('.content-file');
+        var $preview = $container.find('.product-preview');
+        var $placeholder = $container.find('.placeholder-text');
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                $preview
+                    .attr('src', e.target.result)
+                    .removeClass('d-none');
+
+                // Ocultamos el placeholder
+                $placeholder.addClass('d-none');
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            $preview
+                .attr('src', '')
+                .addClass('d-none');
+
+            $placeholder.removeClass('d-none');
+        }
+    }
+</script>

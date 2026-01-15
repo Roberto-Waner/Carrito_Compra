@@ -55,11 +55,13 @@
             //Tipo de input
             IdInput = "cboMarca",
             Input_Type = "select",
-            Select_Options = new Dictionary<string, string>
-            {
-                { "1", "Sí" },
-                { "0", "No" }
-            }
+            Input_IsRequired = true,
+            Select_Options = ViewBag.ListarMarcas
+            // Select_Options = new Dictionary<string, string>
+            // {
+            //     { "1", "Sí" },
+            //     { "0", "No" }
+            // }
         },
         new () //Categoria
         {
@@ -70,11 +72,13 @@
             //Tipo de input
             IdInput = "cboCategoria",
             Input_Type = "select",
-            Select_Options = new Dictionary<string, string>
-            {
-                { "1", "Sí" },
-                { "0", "No" }
-            }
+            Input_IsRequired = true,
+            Select_Options = ViewBag.ListarCategorias
+            // Select_Options = new Dictionary<string, string>
+            // {
+            //     { "1", "Sí" },
+            //     { "0", "No" }
+            // }
         },
         new () //Precio
         {
@@ -179,7 +183,6 @@
                     style="z-index:1050; border-radius:0.375rem;">
                 @await Html.PartialAsync("./Components/_Spinner")
             </div>
-            
         </div>
 
     </div>
@@ -199,45 +202,118 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $('#modalDialog').addClass('modal-lg');
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('modalDialog').classList.add('modal-lg');
 
-            $(document).on('change', 'input[type="file"]', function () {
-                previewImage(this);
-            });
+            const spinner = document.getElementById('spinnerTabla');
+            const tbody = document.getElementById('tableBody');
+
+            // 🔹 Mostrar spinner antes de comenzar
+            spinner.classList.remove('d-none');
+
+            fetch('@Url.Action("ListarProductos", "Mantenedor")', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                }
+            })
+            .then(resp => {
+                if(!resp.ok) throw new Error('Error en la petición');
+                return resp.json();
+            })
+            .then(data => {
+                tbody.innerHTML = '';
+
+                data.listOfProd.forEach(p => {
+                    const tr = document.createElement('tr');
+
+                    //Nombre
+                    const tdNombre = document.createElement('td');
+                    tdNombre.className = 'pt-2';
+                    tdNombre.textContent = p.nombre;
+
+                    //Descripcion
+                    const tdDesc = document.createElement('td');
+                    tdDesc.className = 'pt-2';
+                    tdDesc.textContent = p.description;
+
+                    //
+                });
+            })
+
+            // const modalProduc = document.getElementById('FormModalProducto');
+
+            // modalProduc.addEventListener('shown.bs.modal', () {
+            //     fetch('@Url.Action("ListarMarcas", "Mantenedor")')
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             const selectBrand = document.getElementById('cboMarca');
+            //             if(selectBrand) {
+            //                 selectBrand.innerHTML = '<option value="">Seleccione una marca</option>';
+            //                 data.listOfMarca.forEach(m => {
+            //                     const option = document.createElement('option');
+            //                     option.value = m.idMarca;
+            //                     option.textContent = m.description;
+            //                     selectBrand.appendChild(option);
+            //                 });
+            //             }
+            //         })
+            //         .catch(err => console.error('Error cargando marcas:', err));
+
+            //     fetch('@Url.Action("ListarCategorias", "Mantenedor")')
+            //         .then(response => response.json())
+            //         .then(data => {
+            //             const selectCategories = document.getElementById('cboCategoria');
+            //             if(selectCategories) {
+            //                 selectCategories.innerHTML = '<option value="">Seleccione una Categoria</option>';
+            //                 data.listData.forEach(c => {
+            //                     const option = document.createElement('option');
+            //                     option.value = c.idCategoria;
+            //                     option.textContent = c.description;
+            //                     selectCategories.appendChild(option);
+            //                 });
+            //             }
+            //         })
+            //         .catch(err => console.error('Error cargando categorías:', err));
+            // });
+
         });
-
-        function previewImage(input){
-            var $container = $(input).closest('.content-file');
-
-            if ($container.length === 0) {
-                console.log("No se encontró .content-file");
-                return;
-            }
-
-            var $preview = $container.find('.product-preview');
-            var $placeholder = $container.find('.placeholder-text');
-
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-
-                reader.onload = function(e) {
-                    $preview
-                        .attr('src', e.target.result)
-                        .removeClass('d-none');
-
-                    // Ocultamos el placeholder
-                    $placeholder.addClass('d-none');
-                };
-
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                $preview
-                    .attr('src', '')
-                    .addClass('d-none');
-
-                $placeholder.removeClass('d-none');
-            }
-        }
     </script>
 }
+
+@*
+    $(document).ready(function () {
+        $('#modalDialog').addClass('modal-lg');
+
+        $(document).on('change', 'input[type="file"]', function () {
+            previewImage(this);
+        });
+    });
+
+    function previewImage(input){
+        var $container = $(input).closest('.content-file');
+        var $preview = $container.find('.product-preview');
+        var $placeholder = $container.find('.placeholder-text');
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                $preview
+                    .attr('src', e.target.result)
+                    .removeClass('d-none');
+
+                // Ocultamos el placeholder
+                $placeholder.addClass('d-none');
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            $preview
+                .attr('src', '')
+                .addClass('d-none');
+
+            $placeholder.removeClass('d-none');
+        }
+    }
+*@
